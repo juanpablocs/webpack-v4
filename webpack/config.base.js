@@ -67,8 +67,11 @@ module.exports = {
 
 function createVarsDefinePlugin() {
     const newVars = {};
+    let envLocal = {};
     const envConfig = dotenv.config().parsed;
-    const envLocal  = process.env.NODE_ENV ? {} : dotenv.parse(fs.readFileSync(dotenvLocal));
+    try{
+        envLocal  = process.env.NODE_ENV ? {} : dotenv.parse(fs.readFileSync(dotenvLocal));
+    }catch(e){}
     const envMerge  = Object.assign({}, envConfig, envLocal);
     for (let k in envMerge) {
         newVars['process.env.' + k] = JSON.stringify(envMerge[k]);
@@ -81,8 +84,10 @@ function dotenvOverride() {
         dotenv.config();
         return;
     }
-    const envConfig = dotenv.parse(fs.readFileSync(dotenvLocal));
-    for (let k in envConfig) {
-        process.env[k] = envConfig[k]
-    }
+    try{
+        const envConfig = dotenv.parse(fs.readFileSync(dotenvLocal));
+        for (let k in envConfig) {
+            process.env[k] = envConfig[k]
+        }
+    }catch(e){}
 }
